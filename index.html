@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>بازی دوز پیشرفته</title>
+
+    <link rel="stylesheet" href="style.css">
+
+
+</head>
+
+<body>
+
+    <div class="game-container">
+
+        <div class="game-board">
+            <div class="cell" id="0"></div>
+            <div class="cell" id="1"></div>
+            <div class="cell" id="2"></div>
+            <div class="cell" id="3"></div>
+            <div class="cell" id="4"></div>
+            <div class="cell" id="5"></div>
+            <div class="cell" id="6"></div>
+            <div class="cell" id="7"></div>
+            <div class="cell" id="8"></div>
+            <div class="cell" id="9"></div>
+            <div class="cell" id="10"></div>
+            <div class="cell" id="11"></div>
+            <div class="cell" id="12"></div>
+            <div class="cell" id="13"></div>
+            <div class="cell" id="14"></div>
+            <div class="cell" id="15"></div>
+        </div>
+
+        <div class="game-info">
+            <div>turn: <span id="turn">X</span></div>
+            <button id="restart" onclick="restartGame()" class="main-button"> restart game </button>
+        </div>
+
+    </div>
+
+    <!-- Modal container -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" style="display: none;">&times;</span>
+            <p>Who will start the game?</p>
+            <button class="main-button" role="button" onclick="init('me')">me</button>
+            <button class="main-button" role="button" onclick="init('computer')">computer</button>
+            <br>
+            <hr>
+            <button class="main-button" role="button" onclick="init('no-computer')">
+                Game with two player
+            </button>
+        </div>
+    </div>
+
+    <div id="result-gameModal" class="result-game-modal">
+        <div class="result-game-modal-content">
+            <span class="result-game-close" id="closeModalBtn">&times;</span>
+            <p id="result-gameModal-message">This is a simple modal example.</p>
+            <button onclick="restartGame()" class="main-button"> restart game </button>
+        </div>
+    </div>
+
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>

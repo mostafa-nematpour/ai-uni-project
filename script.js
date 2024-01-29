@@ -6,7 +6,9 @@ let board = [
     '', '', '', '',
 ];
 
-let turn = 'X';
+const XPlayer = 'X';
+const OPlayer = 'O';
+let turn = XPlayer;
 let turnCompleat = true;
 let aroundValidIndex = [];
 let userLastIndex = "";
@@ -46,16 +48,16 @@ document.addEventListener("DOMContentLoaded", function () {
 function init(starter) {
     modal.style.display = "none";
     if (starter == "me") {
-        turn = 'O';
+        turn = OPlayer;
         console.log("OO");
     } else if (starter == "computer") {
-        turn = 'X';
+        turn = XPlayer;
     } else if (starter == 'no-computer') {
         noComputer = true;
-        turn = 'O';
+        turn = OPlayer;
     }
     updateDOM();
-    if (turn == 'X') {
+    if (turn == XPlayer) {
         console.log("start with computer");
         aiTurn();
     }
@@ -63,13 +65,19 @@ function init(starter) {
 
 function handleTurn(e) {
     // prevent click on reserved box
-    if (board[e.target.id] == 'X' || board[e.target.id] == 'O') {
+    if (isThereSymbol(e.target.id, board)) {
+        if (!turnCompleat && e.target.id == userLastIndex) {
+            removeSelected(e.target.id, board);
+            updateDOM();
+            return;
+        }
         console.log("selected");
         return false;
     }
-    if (turnCompleat) {
-        aroundValidIndex = getValidAround(e.target.id);
 
+    if (turnCompleat) {
+
+        aroundValidIndex = getValidAround(e.target.id);
         if (aroundValidIndex.length == 0) {
             console.log("select another");
             return;
@@ -80,7 +88,7 @@ function handleTurn(e) {
         userLastIndex = e.target.id;
         updateDOM();
         // switch turns
-        turn === 'X' ? turn = 'O' : turn = 'X';
+        turn === XPlayer ? turn = OPlayer : turn = XPlayer;
 
         turnCompleat = false;
         return;
@@ -96,10 +104,10 @@ function handleTurn(e) {
         })
         if (!turnCompleat) {
             turnCompleat = true;
-            turn === 'X' ? turn = 'O' : turn = 'X';
+            turn === XPlayer ? turn = OPlayer : turn = XPlayer;
             board[userLastIndex] = "";
             handleTurn(e)
-            return
+            return;
         }
     }
 
@@ -139,8 +147,8 @@ function aiTurn() {
 
         for (let moveItem of availableMoves) {
 
-            board[moveItem[0]] = 'X';
-            board[moveItem[1]] = 'O';
+            board[moveItem[0]] = XPlayer;
+            board[moveItem[1]] = OPlayer;
             // console.log("local" , localBoard);
             // console.log(board);
             let eval = minimax(board, 0, false, alpha, beta);
@@ -165,8 +173,8 @@ function aiTurn() {
     }
     console.log(bestMove);
     // const bestMove = minimax(board, 4, true, alpha, beta);
-    makeMove(bestMove[0], bestMove[1], 'X');
-    turn = 'O';
+    makeMove(bestMove[0], bestMove[1], XPlayer);
+    turn = OPlayer;
 
     // update DOM
     updateDOM();
@@ -175,9 +183,9 @@ function aiTurn() {
 
 function minimax(board, depth, maximizingPlayer, alpha, beta) {
     // بازی تمام شده است، امتیاز را برمی گرداند
-    if (checkWin(board) == 'X') {
+    if (checkWin(board) == XPlayer) {
         return 1;
-    } else if (checkWin(board) == 'O') {
+    } else if (checkWin(board) == OPlayer) {
         return -1;
     } else if (checkWin(board) == 'full') {
         return 0;
@@ -187,8 +195,8 @@ function minimax(board, depth, maximizingPlayer, alpha, beta) {
         let maxEval = -Infinity;
         for (let moveItem of availableMoves) {
             // Make a move on the board
-            board[moveItem[0]] = 'O';
-            board[moveItem[1]] = 'X';
+            board[moveItem[0]] = OPlayer;
+            board[moveItem[1]] = XPlayer;
 
             let eval = minimax(board, depth - 1, false, alpha, beta);
             maxEval = Math.max(maxEval, eval);
@@ -209,8 +217,8 @@ function minimax(board, depth, maximizingPlayer, alpha, beta) {
         let minEval = Infinity;
         for (let moveItem of availableMoves) {
             // Make a move on the board
-            board[moveItem[0]] = 'X';
-            board[moveItem[1]] = 'O';
+            board[moveItem[0]] = XPlayer;
+            board[moveItem[1]] = OPlayer;
             let eval = minimax(board, depth - 1, true, alpha, beta);
             minEval = Math.min(minEval, eval);
 
@@ -237,10 +245,10 @@ function checkWin(board) {
     for (let i = 0; i < 4; i++) {
         let row = [board[i * 4], board[i * 4 + 1], board[i * 4 + 2], board[i * 4 + 3]];
 
-        if (checkThreeInArr(row, 'X')) {
+        if (checkThreeInArr(row, XPlayer)) {
             winX = true;
         }
-        if (checkThreeInArr(row, 'O')) {
+        if (checkThreeInArr(row, OPlayer)) {
             winO = true;
         }
     }
@@ -248,10 +256,10 @@ function checkWin(board) {
     for (let col = 0; col < 4; col++) {
         let column = [board[col], board[col + 4], board[col + 8], board[col + 12]];
         // console.log(column);
-        if (checkThreeInArr(column, 'X')) {
+        if (checkThreeInArr(column, XPlayer)) {
             winX = true;
         }
-        if (checkThreeInArr(column, 'O')) {
+        if (checkThreeInArr(column, OPlayer)) {
             winO = true;
         }
     }
@@ -268,25 +276,25 @@ function checkWin(board) {
         [board[7], board[10], board[13]]
     ];
     diagonals.forEach((arr) => {
-        if (arr.every(cell => cell === 'X')) {
+        if (arr.every(cell => cell === XPlayer)) {
             winX = true;
         }
-        if (arr.every(cell => cell === 'O')) {
+        if (arr.every(cell => cell === OPlayer)) {
             winO = true;
         }
     })
 
-    if (turn === 'X' && winO) {
-        return 'O';
+    if (turn === XPlayer && winO) {
+        return OPlayer;
     }
-    else if (turn === 'O' && winX) {
-        return 'X';
+    else if (turn === OPlayer && winX) {
+        return XPlayer;
     }
     else if (winO) {
-        return 'O';
+        return OPlayer;
     }
     else if (winX) {
-        return 'X';
+        return XPlayer;
     }
 
     if (getAvailableMoves(board).length == 0) {
@@ -326,7 +334,7 @@ function getValidAround(position) {
         (Number(position)) % 4 == 0 ? -1 : Number(position) - 1,      // left
     ];
     around.forEach((i) => {
-        if (i >= 0 && board[i] != 'X' && board[i] != 'O') {
+        if (i >= 0 && board[i] != XPlayer && board[i] != OPlayer) {
             aroundIndex.push(i);
         }
     });
@@ -339,7 +347,7 @@ function canMove(position1, position2, player) {
         return false;
     }
 
-    if (board[position1] == 'X' || board[position1] == 'O') {
+    if (board[position1] == XPlayer || board[position1] == OPlayer) {
         console.log("can't select");
         return false;
     }
@@ -393,7 +401,7 @@ function getRandomMoveIndex(board) {
 
 function anotherPlayer(player) {
     // if X >>> O , if O >>> X , else >>> false
-    return player === 'X' ? 'O' : player === 'O' ? 'X' : false;
+    return player === XPlayer ? OPlayer : player === OPlayer ? XPlayer : false;
 }
 
 function winnerAlert(message) {
@@ -402,7 +410,7 @@ function winnerAlert(message) {
     // Get modal content element
     var modalContent = document.querySelector('#result-gameModal-message');
     // Set modal message text
-   
+
     modalContent.textContent = `${message} won`;
     if (message == 'full') {
         modalContent.textContent = 'The game did not have a winner';
@@ -411,6 +419,18 @@ function winnerAlert(message) {
     modal.style.display = "block";
 }
 
+function isThereSymbol(index, board) {
+    return !!(board[index] == XPlayer || board[index] == OPlayer)
+}
+function removeSelected(index, board) {
+    if (!turnCompleat && index == userLastIndex) {
+        turnCompleat = true;
+        turn === XPlayer ? turn = OPlayer : turn = XPlayer;
+        board[userLastIndex] = '';
+        selectedIndex = '';
+        aroundValidIndex = [];
+    }
+}
 function startAlert() {
     modal.style.display = "block";
 }
@@ -427,7 +447,7 @@ function restartGame() {
     turnCompleat = true;
     aroundValidIndex = [];
     selectedIndex = -1;
-    turn = 'X';
+    turn = XPlayer;
     userLastIndex = "";
     resultModal.style.display = "none";
     startAlert();

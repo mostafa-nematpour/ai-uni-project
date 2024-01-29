@@ -42,36 +42,42 @@ document.addEventListener("DOMContentLoaded", function () {
         cell.addEventListener('click', handleTurn);
     })
 
-    modal.style.display = "block";
+    modal.style.display = "flex";
 });
 
 function init(starter) {
     modal.style.display = "none";
-    if (starter == "me") {
-        turn = OPlayer;
-        console.log("OO");
-    } else if (starter == "computer") {
-        turn = XPlayer;
-    } else if (starter == 'no-computer') {
-        noComputer = true;
-        turn = OPlayer;
+    switch (starter) {
+        case "me":
+            turn = OPlayer;
+            console.log("starter: Player");
+            break;
+        case "computer":
+            console.log("starter: computer");
+            turn = XPlayer;
+            aiTurn();
+            break;
+        case "no-computer":
+            noComputer = true;
+            turn = OPlayer;
+            console.log("starter: Player (with another Player)");
+            break;
     }
     updateDOM();
-    if (turn == XPlayer) {
-        console.log("start with computer");
-        aiTurn();
-    }
 }
 
 function handleTurn(e) {
+    const index = e.target.id;
     // prevent click on reserved box
-    if (isThereSymbol(e.target.id, board)) {
-        if (!turnCompleat && e.target.id == userLastIndex) {
-            removeSelected(e.target.id, board);
+    if (isThereSymbol(index, board)) {
+        // if click on previous selection remove it 
+        // to allow user choose again
+        if (!turnCompleat && index == selectedIndex) {
+            removeSelected(index, board);
             updateDOM();
             return;
         }
-        console.log("selected");
+        console.log("the index you selected is already selected");
         return false;
     }
 
@@ -416,23 +422,23 @@ function winnerAlert(message) {
         modalContent.textContent = 'The game did not have a winner';
     }
     // Open modal
-    modal.style.display = "block";
+    modal.style.display = "flex";
 }
 
 function isThereSymbol(index, board) {
     return !!(board[index] == XPlayer || board[index] == OPlayer)
 }
 function removeSelected(index, board) {
-    if (!turnCompleat && index == userLastIndex) {
+    if (!turnCompleat && index == selectedIndex) {
         turnCompleat = true;
         turn === XPlayer ? turn = OPlayer : turn = XPlayer;
-        board[userLastIndex] = '';
-        selectedIndex = '';
+        board[selectedIndex] = '';
+        selectedIndex = -1;
         aroundValidIndex = [];
     }
 }
 function startAlert() {
-    modal.style.display = "block";
+    modal.style.display = "flex";
 }
 
 function restartGame() {
